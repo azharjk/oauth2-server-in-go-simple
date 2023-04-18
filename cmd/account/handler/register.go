@@ -38,8 +38,7 @@ func RegisterUser(ctx *fiber.Ctx) error {
 		Password: p.Password,
 	})
 
-	sess, _ := session.Get(ctx)
-	sess.Set("user", u)
+	sess, _ := session.SetUser(ctx, u)
 	_ = sess.Save()
 
 	return ctx.RedirectToRoute("account", fiber.Map{})
