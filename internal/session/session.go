@@ -6,6 +6,11 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/session"
 )
 
+func User(ctx *fiber.Ctx) (model.User, error) {
+	sess, err := Get(ctx)
+	return sess.Get("user").(model.User), err
+}
+
 func SetUser(ctx *fiber.Ctx, user model.User) (*session.Session, error) {
 	sess, err := Get(ctx)
 	sess.Set("user", user)
