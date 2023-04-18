@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/estradax/exater/internal/model"
+	"github.com/estradax/exater/internal/model/user"
 	"github.com/estradax/exater/internal/session"
 	"github.com/gofiber/fiber/v2"
 )
@@ -24,20 +25,19 @@ func RegisterUser(ctx *fiber.Ctx) error {
 	p := new(registerForm)
 	_ = ctx.BodyParser(p)
 
-	result := model.DB.Limit(1).Find(&model.User{}, model.User{Email: p.Email})
-	_ = result.Error
+	_, found, _ := user.FindByEmail(p.Email)
 
-	if result.RowsAffected != 0 {
+	if found {
 		// TODO: Notify record already exist.
 		return ctx.RedirectToRoute("register", fiber.Map{})
 	}
 
-	user := model.User{Name: p.Name, Email: p.Email, Password: p.Password}
-	result = model.DB.Create(&user)
+	u := model.User{Name: p.Name, Email: p.Email, Password: p.Password}
+	result := model.DB.Create(&u)
 	_ = result.Error
 
 	sess, _ := session.Get(ctx)
-	sess.Set("user", user)
+	sess.Set("user", u)
 	_ = sess.Save()
 
 	return ctx.RedirectToRoute("account", fiber.Map{})
