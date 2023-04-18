@@ -32,9 +32,11 @@ func RegisterUser(ctx *fiber.Ctx) error {
 		return ctx.RedirectToRoute("register", fiber.Map{})
 	}
 
-	u := model.User{Name: p.Name, Email: p.Email, Password: p.Password}
-	result := model.DB.Create(&u)
-	_ = result.Error
+	u, _ := user.Create(model.User{
+		Name:     p.Name,
+		Email:    p.Email,
+		Password: p.Password,
+	})
 
 	sess, _ := session.Get(ctx)
 	sess.Set("user", u)
