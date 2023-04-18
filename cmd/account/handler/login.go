@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/estradax/exater/internal/model"
+	"github.com/estradax/exater/internal/model/user"
 	"github.com/estradax/exater/internal/session"
 	"github.com/gofiber/fiber/v2"
 )
@@ -23,22 +23,20 @@ func CreateSession(ctx *fiber.Ctx) error {
 	p := new(loginForm)
 	_ = ctx.BodyParser(p)
 
-	user := new(model.User)
-	result := model.DB.Limit(1).Find(user, model.User{Email: p.Email})
-	_ = result.Error
+	u, found, _ := user.FindByEmail(p.Email)
 
-	if result.RowsAffected != 1 {
+	if !found {
 		// TODO: Notify record is not exist.
 		return ctx.RedirectToRoute("login", fiber.Map{})
 	}
 
-	if user.Password != p.Password {
+	if u.Password != p.Password {
 		// TODO: Credentials are not valid.
 		return ctx.RedirectToRoute("login", fiber.Map{})
 	}
 
 	sess, _ := session.Get(ctx)
-	sess.Set("user", user)
+	sess.Set("user", u)
 	_ = sess.Save()
 
 	return ctx.RedirectToRoute("account", fiber.Map{})
