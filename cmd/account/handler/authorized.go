@@ -6,10 +6,9 @@ import (
 )
 
 func Authorized(ctx *fiber.Ctx) error {
-	sess, _ := session.Get(ctx)
-	user := sess.Get("user")
+	b, _ := session.IsAuthorized(ctx)
 
-	if user == nil {
+	if !b {
 		return ctx.RedirectToRoute("login", fiber.Map{})
 	}
 
