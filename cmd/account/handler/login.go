@@ -7,9 +7,8 @@ import (
 )
 
 func Login(ctx *fiber.Ctx) error {
-	url, _ := ctx.GetRouteURL("createSession", fiber.Map{})
 	return ctx.Render("login", fiber.Map{
-		"CreateSessionURL": url,
+		"CreateSessionURL": ctx.OriginalURL(),
 	})
 }
 
@@ -27,16 +26,19 @@ func CreateSession(ctx *fiber.Ctx) error {
 
 	if !found {
 		// TODO: Notify record is not exist.
-		return ctx.RedirectToRoute("login", fiber.Map{})
+		return ctx.Redirect(ctx.OriginalURL())
 	}
 
 	if u.Password != p.Password {
 		// TODO: Credentials are not valid.
-		return ctx.RedirectToRoute("login", fiber.Map{})
+		return ctx.Redirect(ctx.OriginalURL())
 	}
 
 	sess, _ := session.SetUser(ctx, u)
 	_ = sess.Save()
 
-	return ctx.RedirectToRoute("account", fiber.Map{})
+	accountURL, _ := ctx.GetRouteURL("account", fiber.Map{})
+	redirectURI := ctx.Query("continue_uri", accountURL)
+
+	return ctx.Redirect(redirectURI)
 }
