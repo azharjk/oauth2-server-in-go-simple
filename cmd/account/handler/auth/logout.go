@@ -1,4 +1,4 @@
-package handler
+package auth
 
 import (
 	"github.com/estradax/exater/internal/session"
