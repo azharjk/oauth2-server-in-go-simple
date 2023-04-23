@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"github.com/estradax/exater/internal/model/client"
 	"github.com/gofiber/fiber/v2"
 	"net/url"
 )
@@ -8,6 +9,33 @@ import (
 type authorizeQuery struct {
 	ResponseType string `query:"response_type"`
 	ClientID     string `query:"client_id"`
+	RedirectURI  string `query:"redirect_uri"`
+}
+
+func newErrorRedirectURI(s, s1 string) (string, error) {
+	u, err := url.Parse(s)
+	if err != nil {
+		return "", err
+	}
+
+	q := u.Query()
+	q.Set("error", s1)
+	u.RawQuery = q.Encode()
+
+	return u.String(), nil
+}
+
+func newRedirectURI(s string) (string, error) {
+	u, err := url.Parse(s)
+	if err != nil {
+		return "", err
+	}
+
+	q := u.Query()
+	q.Set("code", "code")
+	u.RawQuery = q.Encode()
+
+	return u.String(), nil
 }
 
 func Authorize(ctx *fiber.Ctx) error {
@@ -15,10 +43,14 @@ func Authorize(ctx *fiber.Ctx) error {
 	p := new(authorizeQuery)
 	_ = ctx.QueryParser(p)
 
-	u, _ := url.Parse("http://localhost:9080/oauth2/callback")
-	q := u.Query()
-	q.Set("code", "code")
-	u.RawQuery = q.Encode()
+	c, _, _ := client.FindByID(p.ClientID)
 
-	return ctx.Redirect(u.String())
+	if p.RedirectURI != c.RedirectURI {
+		u, _ := newErrorRedirectURI(c.RedirectURI, "invalid_request")
+		return ctx.Redirect(u)
+	}
+
+	u, _ := newRedirectURI(c.RedirectURI)
+
+	return ctx.Redirect(u)
 }
