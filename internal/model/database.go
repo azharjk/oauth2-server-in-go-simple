@@ -21,7 +21,7 @@ func Connect() error {
 	return nil
 }
 
-func Setup() error {
+func Migrate() error {
 	err := Connect()
 	if err != nil {
 		return err
