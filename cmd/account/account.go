@@ -1,15 +1,18 @@
 package main
 
 import (
-	"github.com/estradax/exater/cmd/account/handler"
 	"github.com/estradax/exater/internal/model"
 	"github.com/estradax/exater/internal/session"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html"
+	"github.com/joho/godotenv"
+	"os"
 )
 
 func main() {
+	_ = godotenv.Load()
+
 	model.Setup()
 
 	engine := html.New("./web/account", ".html")
@@ -22,9 +25,9 @@ func main() {
 
 	app.Use(logger.New())
 
-	app.Get("/", handler.Authorized, handler.Account).Name("account")
-
+	setupAccountRoute(app)
 	setupAuthRoute(app)
+	setupOAuth2Route(app)
 
-	_ = app.Listen(":8080")
+	_ = app.Listen(os.Getenv("ACCOUNT_ADDR"))
 }
