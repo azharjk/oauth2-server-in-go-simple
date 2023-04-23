@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/estradax/exater/internal/model"
 	"github.com/estradax/exater/internal/session"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -12,8 +11,6 @@ import (
 
 func main() {
 	_ = godotenv.Load()
-
-	model.Setup()
 
 	engine := html.New("./web/account", ".html")
 
