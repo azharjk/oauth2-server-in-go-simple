@@ -8,15 +8,26 @@ import (
 
 var DB *gorm.DB
 
-func Setup() error {
-	DB, err := gorm.Open(sqlite.Open("./sqlite/exater.sqlite"), &gorm.Config{
+func Connect() error {
+	t, err := gorm.Open(sqlite.Open("./sqlite/exater.sqlite"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {
 		return err
 	}
 
-	err = DB.AutoMigrate(User{})
+	DB = t
+
+	return nil
+}
+
+func Setup() error {
+	err := Connect()
+	if err != nil {
+		return err
+	}
+
+	err = DB.AutoMigrate(User{}, Client{})
 	if err != nil {
 		return err
 	}
