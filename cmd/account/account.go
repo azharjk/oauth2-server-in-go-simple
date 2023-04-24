@@ -7,13 +7,18 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html"
 	"github.com/joho/godotenv"
+	"log"
 	"os"
 )
 
 func main() {
-	_ = godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Fatal(err)
+	}
 
-	_ = model.Connect()
+	if err := model.Connect(); err != nil {
+		log.Fatal(err)
+	}
 
 	engine := html.New("./web/account", ".html")
 
@@ -29,5 +34,7 @@ func main() {
 	setupAuthRoute(app)
 	setupOAuth2Route(app)
 
-	_ = app.Listen(os.Getenv("ACCOUNT_ADDR"))
+	if err := app.Listen(os.Getenv("ACCOUNT_ADDR")); err != nil {
+		log.Fatal(err)
+	}
 }
