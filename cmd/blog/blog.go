@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/template/html"
 	"github.com/joho/godotenv"
 	"golang.org/x/oauth2"
+	"io"
 	"os"
 )
 
@@ -21,7 +22,7 @@ func main() {
 		RedirectURL:  "http://" + os.Getenv("BLOG_ADDR") + "/oauth2/callback",
 		Endpoint: oauth2.Endpoint{
 			AuthURL:   "http://" + os.Getenv("ACCOUNT_ADDR") + "/oauth2/authorize",
-			TokenURL:  "http://localhost:6080/oauth2/token",
+			TokenURL:  "http://" + os.Getenv("API_ADDR") + "/oauth2/token",
 			AuthStyle: oauth2.AuthStyleInHeader,
 		},
 	}
@@ -41,10 +42,16 @@ func main() {
 	})
 
 	app.Get("/oauth2/callback", func(ctx *fiber.Ctx) error {
-		code := ctx.Query("code")
-		tok, _ := conf.Exchange(ctx.UserContext(), code)
+		c := ctx.UserContext()
 
-		fmt.Println(tok)
+		code := ctx.Query("code")
+		tok, _ := conf.Exchange(c, code)
+
+		client := conf.Client(c, tok)
+		resp, _ := client.Get("http://" + os.Getenv("API_ADDR") + "/userinfo")
+
+		b, _ := io.ReadAll(resp.Body)
+		fmt.Println(string(b))
 
 		return nil
 	})
