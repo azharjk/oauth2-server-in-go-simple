@@ -4,6 +4,7 @@ import (
 	"github.com/estradax/exater/cmd/account/handler"
 	"github.com/estradax/exater/internal/model"
 	"github.com/estradax/exater/internal/session"
+	"github.com/estradax/exater/internal/validate"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html"
@@ -28,6 +29,7 @@ func main() {
 	})
 
 	session.Setup()
+	validate.Setup()
 
 	app.Use(logger.New())
 	app.Use(handler.Error)

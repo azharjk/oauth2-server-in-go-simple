@@ -17,6 +17,12 @@ func SetUser(ctx *fiber.Ctx, user model.User) (*session.Session, error) {
 	return sess, err
 }
 
+func SetError(ctx *fiber.Ctx, s string) (*session.Session, error) {
+	sess, err := Get(ctx)
+	sess.Set("error", s)
+	return sess, err
+}
+
 func IsAuthorized(ctx *fiber.Ctx) (bool, error) {
 	sess, err := Get(ctx)
 	user := sess.Get("user")

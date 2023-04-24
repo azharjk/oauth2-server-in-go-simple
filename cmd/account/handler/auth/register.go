@@ -4,7 +4,7 @@ import (
 	"github.com/estradax/exater/internal/model"
 	"github.com/estradax/exater/internal/model/user"
 	"github.com/estradax/exater/internal/session"
-	"github.com/go-playground/validator/v10"
+	"github.com/estradax/exater/internal/validate"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -31,7 +31,6 @@ func RegisterUser(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	validate := validator.New()
 	if err := validate.Struct(p); err != nil {
 		return err
 	}
