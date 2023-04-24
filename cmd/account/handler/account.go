@@ -6,9 +6,16 @@ import (
 )
 
 func Account(ctx *fiber.Ctx) error {
-	user, _ := session.User(ctx)
+	user, err := session.User(ctx)
+	if err != nil {
+		return err
+	}
 
-	url, _ := ctx.GetRouteURL("logout", fiber.Map{})
+	url, err := ctx.GetRouteURL("logout", fiber.Map{})
+	if err != nil {
+		return err
+	}
+
 	return ctx.Render("account", fiber.Map{
 		"User":      user,
 		"LogoutURL": url,
