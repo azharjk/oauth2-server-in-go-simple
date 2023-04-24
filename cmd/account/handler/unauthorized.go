@@ -6,7 +6,10 @@ import (
 )
 
 func Unauthorized(ctx *fiber.Ctx) error {
-	b, _ := session.IsAuthorized(ctx)
+	b, err := session.IsAuthorized(ctx)
+	if err != nil {
+		return err
+	}
 
 	if b {
 		return ctx.RedirectToRoute("account", fiber.Map{})

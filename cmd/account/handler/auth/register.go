@@ -42,7 +42,16 @@ func RegisterUser(ctx *fiber.Ctx) error {
 	}
 
 	if found {
-		// TODO: Notify record already exist.
+		sess, err := session.Get(ctx)
+		if err != nil {
+			return err
+		}
+
+		sess.Set("error", "record is already exist")
+		if err := sess.Save(); err != nil {
+			return err
+		}
+
 		return ctx.RedirectToRoute("register", fiber.Map{})
 	}
 

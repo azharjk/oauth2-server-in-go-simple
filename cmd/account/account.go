@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/estradax/exater/cmd/account/handler"
 	"github.com/estradax/exater/internal/model"
 	"github.com/estradax/exater/internal/session"
 	"github.com/gofiber/fiber/v2"
@@ -29,6 +30,7 @@ func main() {
 	session.Setup()
 
 	app.Use(logger.New())
+	app.Use(handler.Error)
 
 	setupAccountRoute(app)
 	setupAuthRoute(app)
