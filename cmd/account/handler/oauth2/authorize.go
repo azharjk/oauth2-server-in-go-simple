@@ -41,16 +41,37 @@ func newRedirectURI(s string) (string, error) {
 func Authorize(ctx *fiber.Ctx) error {
 	// TODO: Validate data.
 	p := new(authorizeQuery)
-	_ = ctx.QueryParser(p)
+	if err := ctx.QueryParser(p); err != nil {
+		return err
+	}
 
-	c, _, _ := client.FindByID(p.ClientID)
+	c, found, err := client.FindByID(p.ClientID)
+	if err != nil {
+		return err
+	}
 
-	if p.RedirectURI != c.RedirectURI {
-		u, _ := newErrorRedirectURI(c.RedirectURI, "invalid_request")
+	if !found {
+		u, err := newErrorRedirectURI(c.RedirectURI, "invalid_request")
+		if err != nil {
+			return err
+		}
+
 		return ctx.Redirect(u)
 	}
 
-	u, _ := newRedirectURI(c.RedirectURI)
+	if p.RedirectURI != c.RedirectURI {
+		u, err := newErrorRedirectURI(c.RedirectURI, "invalid_request")
+		if err != nil {
+			return err
+		}
+
+		return ctx.Redirect(u)
+	}
+
+	u, err := newRedirectURI(c.RedirectURI)
+	if err != nil {
+		return err
+	}
 
 	return ctx.Redirect(u)
 }
