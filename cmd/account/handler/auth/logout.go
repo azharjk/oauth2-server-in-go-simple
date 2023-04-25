@@ -6,8 +6,15 @@ import (
 )
 
 func Logout(ctx *fiber.Ctx) error {
-	sess, _ := session.Get(ctx)
-	_ = sess.Regenerate()
+	sess, err := session.Get(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = sess.Regenerate()
+	if err != nil {
+		return err
+	}
 
 	return ctx.RedirectToRoute("login", fiber.Map{})
 }
